@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Link, graphql } from 'gatsby'
 
+import Comparison from '../components/Comparison'
 import Layout from '../components/Layout'
 import Features from '../components/Features'
 import BlogRoll from '../components/BlogRoll'
@@ -23,6 +24,7 @@ export const IndexPageTemplate = ({
           !!image.childImageSharp ? image.childImageSharp.fluid.src : image
         })`,
         backgroundPosition: `top left`,
+        backgroundSize: '100%',
         backgroundAttachment: `fixed`,
       }}
     >
@@ -64,6 +66,7 @@ export const IndexPageTemplate = ({
         </h3>
       </div>
     </div>
+    <Comparison />
     <section className="section section--gradient">
       <div className="container">
         <div className="section">
@@ -177,7 +180,7 @@ export const pageQuery = graphql`
           blurbs {
             image {
               childImageSharp {
-                fluid(maxWidth: 240, quality: 64) {
+                fluid(maxWidth: 1080, quality: 64) {
                   ...GatsbyImageSharpFluid
                 }
               }

@@ -1,7 +1,7 @@
 ---
 templateKey: index-page
 title: Maximize your pizza per $
-image: /img/home-jumbotron.jpg
+image: /img/alan-hardman-SU1LFoeEUkk-unsplash.jpg
 heading: Maximize your pizza per $
 subheading: Dont get ripped off by Big Pizza
 mainpitch:
