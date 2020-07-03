@@ -9,6 +9,7 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Form, Select, Input } from './Form';
 import { IconButton } from '@material-ui/core';
+import LocalPizzaIcon from '@material-ui/icons/LocalPizza';
 
 export const ACTIONS = {
     ADD_SET: 'ADD_SET',
@@ -42,7 +43,7 @@ const makeDefaultPizza = (opts = {}) => ({
     ...opts
 })
 const makeDefaultOptionSet = (opts = {}) => ({
-    pies: [
+    pies: opts.pies || [
         makeDefaultPizza()
     ]
 })
@@ -52,7 +53,12 @@ const getInitialState = () => {
 
     return {
         optionSets: [
-            makeDefaultOptionSet()
+            makeDefaultOptionSet(),
+            makeDefaultOptionSet({
+                pies: [
+                    makeDefaultPizza({size: 20, cost: 20})
+                ]
+            }),
         ],
     }
 }
@@ -171,15 +177,18 @@ const PieLine = ({ pie, setIdx, pieIdx }) => {
         [actions],
     );
     return <Box>
-        Pie
-        <Form onSubmit={(v) => alert(v)} defaultValues={pie} hideSubmit>
-            <Select name="type" options={["CIRCLE", "SQUARE"]} />
-            <Input name="size" placeholder="Size (Inches)" />
-            <Input name="cost" placeholder="Cost of Pizza ($)" />
-        </Form>
-        <IconButton onClick={removePie}>
-            <DeleteIcon />
-        </IconButton>
+        Pie #{pieIdx + 1}
+        <Box display="flex">
+            <Form onSubmit={(v) => alert(v)} defaultValues={pie} hideSubmit>
+                <Select name="type" options={["CIRCLE", "SQUARE"]} />
+                <Input name="size" label="Size" placeholder="Size (Inches)" />
+                <Input name="cost" label="Cost" placeholder="Cost of Pizza ($)" />
+            </Form>
+            <IconButton onClick={removePie}>
+                <DeleteIcon />
+            </IconButton>
+        </Box>
+
     </Box>
 }
 
@@ -203,6 +212,9 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
             <IconButton onClick={removeSet}>
                 <DeleteIcon />
             </IconButton>
+        </Box>
+        <Box display="flex">
+            {pies.map((p, idx) => <LocalPizzaIcon key={idx} />)}
         </Box>
         <Box display="flex" justifyContent="space-around">
             <Typography>
@@ -229,9 +241,10 @@ const Comparison = () => {
     const {
         optionSets
     } = state;
-    return <PizzaContext.Provider value={{state, actions}}>
+    return <PizzaContext.Provider value={{ state, actions }}>
         <Container>
-            <Typography variant="h3" textAlign="center">Compare Pizzas</Typography>
+            <Typography variant="h4" textAlign="center">Compare Pizza Orders</Typography>
+            <Typography variant="h6" textAlign="center">Find the best one!</Typography>
             <Grid container>
                 <Box display={'flex'}>
                     {

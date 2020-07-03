@@ -1,12 +1,24 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller, FormContext } from 'react-hook-form';
-import { Box, Button, withStyles, Input as MUIInput, Select as MUISelect, MenuItem, TextField, IconButton, Typography } from '@material-ui/core';
+import {
+    Box,
+    Button,
+    withStyles,
+    TextField,
+    Input as MUIInput,
+    Select as MUISelect,
+    MenuItem,
+    IconButton,
+    Typography
+} from '@material-ui/core';
 import { Debug } from './admin';
 import { formatAsDollar } from '../utils/finance';
 import AddIcon from '@material-ui/icons/Add';
 import MinusIcon from '@material-ui/icons/Remove';
 import FormLabel from '@material-ui/core/FormLabel';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 
 const SubmitButton = withStyles((theme) => ({
     root: {
@@ -79,16 +91,21 @@ const ListingDurationInput = ({ setValue, inputProps: { dailyMaxRate = 0, hourly
 
 
 export function Input({ register, name, ...rest }) {
-    return <MUIInput name={name} inputRef={register} {...rest} />;
+    return <TextField name={name} inputRef={register} {...rest} />;
 }
 
-export function Select({ register, options, name, ...rest }) {
+export function Select({ register, options, label, name, ...rest }) {
     return (
-        <select name={name} ref={register} {...rest}>
-            {options.map(value => (
-                <option value={value}>{value}</option>
-            ))}
-        </select>
+        <React.Fragment>
+            <FormLabel>
+                {label}
+            </FormLabel>
+            <select name={name} ref={register} {...rest}>
+                {options.map(value => (
+                    <option value={value}>{value}</option>
+                ))}
+            </select>
+        </React.Fragment>
     );
 }
 
