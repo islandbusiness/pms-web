@@ -37,7 +37,9 @@ const PIZZA_SHAPES = [
 
 const makeDefaultPizza = (opts = {}) => ({
     type: PIZZA_SHAPES[0],
-    size: 14,
+    diameter: 10,
+    width: 6,
+    height: 8,
     sizeUnit: 'cm',
     cost: 10,
     costCurrency: 'USD',
@@ -174,12 +176,12 @@ const useComparison = (opts = {}) => {
 
 const PIE_OPTS = [
     {
-        value: "CIRCLE",
+        value: 'CIRCLE',
         label: 'circle',
         icon: <RadioButtonUncheckedIcon />
     },
     {
-        value: "SQUARE",
+        value: 'SQUARE',
         label: 'square',
         icon: <CropLandscapeIcon />
     }
@@ -200,20 +202,39 @@ const PieLine = ({ pie, setIdx, pieIdx }) => {
         },
         [actions],
     );
+    const swapPieType = useCallback(
+        (type) => {
+            actions.updatePizza(setIdx, pieIdx, { ...pie, type })
+        },
+        [actions]
+    );
+
+    const formChildren = pie.type === PIZZA_SHAPES[0] ?
+        [<Input name="diameter" label="Diameter" placeholder="Size (Inches)" />]
+        : [
+            <Input name="height" label="Height" placeholder="Height (Inches)" />,
+            <Input name="width" label="Width" placeholder="Width (Inches)" />
+
+        ];
     return <Card style={{ padding: '1rem', marginBottom: 8 }}>
         <Box display="flex" alignItems='flex-start'>
-            <Form onSubmit={updatePie} defaultValues={pie}>
-                <ToggleGroup name="type" defaultValue={pie.type} options={PIE_OPTS} />
-                <br />
-                <Input name="size" label="Size" placeholder="Size (Inches)" />
-                <Input name="cost" label="Cost" placeholder="Cost of Pizza ($)" />
-            </Form>
+            <Box flex={1}>
+                <ToggleGroup name="type" defaultValue={pie.type} onChange={swapPieType} options={PIE_OPTS} />
+                <Form onSubmit={updatePie} defaultValues={pie}>
+                    {
+                        formChildren
+                    }
+                    <Input name="cost" label="Cost" placeholder="Cost of Pizza ($)" />
+                </Form>
+            </Box>
             <IconButton onClick={removePie}>
                 <DeleteIcon />
             </IconButton>
         </Box>
     </Card>
 }
+
+const getPieArea = (pie) => pie.type === PIZZA_SHAPES[0] ? Math.PI * (pie.size / 2) ** 2 : (pie.width * pie.height)
 
 const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
 
@@ -229,6 +250,16 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
         },
         [actions],
     );
+    const summaryData = pies.reduce((acc, pie) => {
+
+        return {
+            ...acc,
+            area: acc.area + getPieArea(pie),
+            total: acc.total + pie.cost
+        }
+    }, {
+        total: 0
+    })
     return <Box style={{ padding: '1rem 0px' }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" style={{ borderBottom: '1px solid rgba(0,0,0,0.2)', marginBotom: 6 }}>
             <Typography variant={'h6'}>Order Combo #{index + 1}</Typography>
@@ -244,7 +275,7 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
                 {pies.length} Pies
             </Typography>
             <Typography>
-                ${pies.reduce((acc, pie) => acc + pie.cost, 0)} Total
+                ${summaryData.total} Total
             </Typography>
         </Box>
         {

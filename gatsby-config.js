@@ -29,6 +29,7 @@ module.exports = {
         name: 'images',
       },
     },
+    `gatsby-plugin-material-ui`,
     'gatsby-plugin-sharp',
     'gatsby-transformer-sharp',
     {

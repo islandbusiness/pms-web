@@ -51,20 +51,28 @@ export function Select({ register, options, label, name, ...rest }) {
     );
 }
 
-export function ToggleGroup({ register, required, setValue, defaultValue, options, label, name, ...rest }) {
+export function ToggleGroup({ register, required, setValue = () => (false), onChange, defaultValue, options, label, name, ...rest }) {
     const [internalValue, setInternalValue] = useState(defaultValue);
 
     const handleNewValue = (event, newValue) => {
-      setInternalValue(newValue);
+        setInternalValue(newValue);
     };
     useEffect(() => {
-        console.log(name, internalValue)
-        setValue(name, internalValue);
+        console.log(name, internalValue);
+        if (setValue) {
+            setValue(name, internalValue);
+        }
+        if (onChange) {
+            onChange(internalValue);
+        }
         return () => {
             // Do nothing to cleanup
         };
     }, [internalValue]);
     useEffect(() => {
+
+        if (!register) return;
+
         register({ name, required }); // custom register react-select
     }, [register]);
 
