@@ -7,7 +7,7 @@ import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
-import Form from './Form';
+import { Form, Select, Input } from './Form';
 import { IconButton } from '@material-ui/core';
 
 export const ACTIONS = {
@@ -100,7 +100,7 @@ const comparisonReducer = (state, action) => {
                 ...state,
                 optionSets: state.optionSets.map((set, idx) => idx !== action.setIdx ? set : {
                     ...set,
-                    pies: set.pies.filter((pie, pieIdx) => pieIdx !== action.payload)
+                    pies: set.pies.filter((pie, pieIdx) => pieIdx !== action.pieIdx)
                 })
             }
         default:
@@ -162,9 +162,24 @@ const useComparison = (opts = {}) => {
     }
 }
 
-const PieLine = ({ pie, index }) => {
+const PieLine = ({ pie, setIdx, pieIdx }) => {
+    const { actions } = React.useContext(PizzaContext)
+    const removePie = useCallback(
+        () => {
+            actions.removePizza(setIdx, pieIdx)
+        },
+        [actions],
+    );
     return <Box>
         Pie
+        <Form onSubmit={(v) => alert(v)} defaultValues={pie} hideSubmit>
+            <Select name="type" options={["CIRCLE", "SQUARE"]} />
+            <Input name="size" placeholder="Size (Inches)" />
+            <Input name="cost" placeholder="Cost of Pizza ($)" />
+        </Form>
+        <IconButton onClick={removePie}>
+            <DeleteIcon />
+        </IconButton>
     </Box>
 }
 
@@ -182,8 +197,8 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
         },
         [actions],
     );
-    return <Card style={{padding: '1rem'}}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" style={{borderBottom: '1px solid rgba(0,0,0,0.2)', marginBotom: 6}}>
+    return <Card style={{ padding: '1rem' }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" style={{ borderBottom: '1px solid rgba(0,0,0,0.2)', marginBotom: 6 }}>
             <Typography variant={'h6'}>Order Combo #{index + 1}</Typography>
             <IconButton onClick={removeSet}>
                 <DeleteIcon />
@@ -198,7 +213,7 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
             </Typography>
         </Box>
         {
-            pies.map((pie, i) => <PieLine key={i} pie={pie} />)
+            pies.map((pie, i) => <PieLine setIdx={index} pieIdx={i} actions={actions} key={i} pie={pie} />)
         }
         <Button variant="contained" color="Primary" onClick={addPieToSet}>
             <AddIcon /> Pie
@@ -206,27 +221,31 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
     </Card>
 }
 
+const PizzaContext = React.createContext();
+
 const Comparison = () => {
     const { state, actions } = useComparison();
 
     const {
         optionSets
     } = state;
-    return <Container>
-        <Typography variant="h3" textAlign="center">Compare Pizzas</Typography>
-        <Grid container>
-            <Box display={'flex'}>
-                {
-                    optionSets.map((set, i) => <Box flex={1} key={i}>
-                        <ComparisonSet index={i} actions={actions} {...set} />
-                    </Box>)
-                }
-            </Box>
-            <Grid item>
-                <Button variant="h5" textAlign="center" onClick={actions.addOptionSet}>Add New Set</Button>
+    return <PizzaContext.Provider value={{state, actions}}>
+        <Container>
+            <Typography variant="h3" textAlign="center">Compare Pizzas</Typography>
+            <Grid container>
+                <Box display={'flex'}>
+                    {
+                        optionSets.map((set, i) => <Box flex={1} key={i}>
+                            <ComparisonSet index={i} actions={actions} {...set} />
+                        </Box>)
+                    }
+                </Box>
+                <Grid item>
+                    <Button variant="h5" textAlign="center" onClick={actions.addOptionSet}>Add New Set</Button>
+                </Grid>
             </Grid>
-        </Grid>
-    </Container>
+        </Container>
+    </PizzaContext.Provider>
 }
 
 export default Comparison;

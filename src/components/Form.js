@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
-import { useForm, FormContext } from 'react-hook-form';
-import { Box, Button, withStyles, TextField, IconButton, Typography } from '@material-ui/core';
+import { useForm, Controller, FormContext } from 'react-hook-form';
+import { Box, Button, withStyles, Input as MUIInput, Select as MUISelect, MenuItem, TextField, IconButton, Typography } from '@material-ui/core';
 import { Debug } from './admin';
 import { formatAsDollar } from '../utils/finance';
 import AddIcon from '@material-ui/icons/Add';
@@ -78,6 +78,10 @@ const ListingDurationInput = ({ setValue, inputProps: { dailyMaxRate = 0, hourly
 };
 
 
+export function Input({ register, name, ...rest }) {
+    return <MUIInput name={name} inputRef={register} {...rest} />;
+}
+
 export function Select({ register, options, name, ...rest }) {
     return (
         <select name={name} ref={register} {...rest}>
@@ -85,58 +89,6 @@ export function Select({ register, options, name, ...rest }) {
                 <option value={value}>{value}</option>
             ))}
         </select>
-    );
-}
-
-export function Input({
-    register = () => null,
-    className,
-    wrapClass,
-    children,
-    control,
-    setValue,
-    getValues,
-    type,
-    label,
-    name,
-    required,
-    ...rest
-}) {
-    let CompSelected = TextField;
-    const inputProps = {
-        fullWidth: true,
-        className,
-        setValue,
-        register,
-        required,
-        inputProps: {
-            ref: register({
-                required,
-            }),
-        },
-    };
-    switch (type) {
-        case 'duration':
-            CompSelected = ListingDurationInput;
-            break;
-        case 'submit':
-            CompSelected = SubmitButton;
-            break;
-        default:
-        // Do nothing
-    }
-    const val = getValues(name);
-    return (
-        <Box marginTop={2} marginBottom={2} className={wrapClass}>
-
-            <CompSelected name={name} InputLabelProps={{ shrink: true }} label={label} {...inputProps} {...rest} />
-            <Box key={val}>
-                {typeof children === 'function' ? children({
-                    value: val,
-                    key: val,
-                }) : null}
-            </Box>
-        </Box>
     );
 }
 
@@ -159,37 +111,35 @@ export function Form({
     const { handleSubmit } = methods;
 
     return (
-        <FormContext {...methods}>
 
-            <form onSubmit={handleSubmit(onSubmit)}>
-                {Array.isArray(children)
-                    ? children.map(child => (child.props && child.props.name
-                        ? React.createElement(child.type, {
-                            ...{
-                                ...child.props,
-                                ...methods,
-                                key: child.props ? child.props.name : child.key,
-                            },
-                        })
-                        : child))
-                    : children}
-                <Box textAlign="center" {...submitContainerProps}>
-                    {
-                        hideSubmit ? null
-                            : (
-                                <SubmitButton variant="contained" color="primary" type="submit">
-                                    {isLoading ? 'Loading...' : renderSubmitText({ formState: methods.getValues(), getValues: methods.getValues })}
-                                </SubmitButton>
-                            )
-                    }
-                </Box>
+        <form onSubmit={handleSubmit(onSubmit)}>
+            {Array.isArray(children)
+                ? children.map(child => (child.props && child.props.name
+                    ? React.createElement(child.type, {
+                        ...{
+                            ...child.props,
+                            ...methods,
+                            key: child.props ? child.props.name : child.key,
+                        },
+                    })
+                    : child))
+                : children}
+            <Box textAlign="center" {...submitContainerProps}>
                 {
-                    debug
-                        ? <Debug display data={methods.formState} />
-                        : null
+                    hideSubmit ? null
+                        : (
+                            <SubmitButton variant="contained" color="primary" type="submit">
+                                {isLoading ? 'Loading...' : renderSubmitText({ formState: methods.getValues(), getValues: methods.getValues })}
+                            </SubmitButton>
+                        )
                 }
-            </form>
-        </FormContext>
+            </Box>
+            {
+                debug
+                    ? <Debug display data={methods.formState} />
+                    : null
+            }
+        </form>
     );
 }
 Form.Input = Input;
