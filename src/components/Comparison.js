@@ -7,10 +7,11 @@ import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { Form, Select, Input } from './Form';
+import { Form, ToggleGroup, Input } from './Form';
 import { IconButton } from '@material-ui/core';
 import LocalPizzaIcon from '@material-ui/icons/LocalPizza';
-
+import CropLandscapeIcon from '@material-ui/icons/CropLandscape'
+import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 export const ACTIONS = {
     ADD_SET: 'ADD_SET',
     REMOVE_SET: 'REMOVE_SET',
@@ -40,6 +41,7 @@ const makeDefaultPizza = (opts = {}) => ({
     sizeUnit: 'cm',
     cost: 10,
     costCurrency: 'USD',
+    quantity: 1,
     ...opts
 })
 const makeDefaultOptionSet = (opts = {}) => ({
@@ -56,7 +58,7 @@ const getInitialState = () => {
             makeDefaultOptionSet(),
             makeDefaultOptionSet({
                 pies: [
-                    makeDefaultPizza({size: 20, cost: 20})
+                    makeDefaultPizza({ size: 20, cost: 20 })
                 ]
             }),
         ],
@@ -168,7 +170,20 @@ const useComparison = (opts = {}) => {
         actions,
         rawDispatch: dispatch
     }
-}
+};
+
+const PIE_OPTS = [
+    {
+        value: "CIRCLE",
+        label: 'circle',
+        icon: <RadioButtonUncheckedIcon />
+    },
+    {
+        value: "SQUARE",
+        label: 'square',
+        icon: <CropLandscapeIcon />
+    }
+]
 
 const PieLine = ({ pie, setIdx, pieIdx }) => {
     const { actions } = React.useContext(PizzaContext)
@@ -185,11 +200,11 @@ const PieLine = ({ pie, setIdx, pieIdx }) => {
         },
         [actions],
     );
-    return <Card style={{padding: '1rem', marginBottom: 8}}>
-        Pie #{pieIdx + 1}
-        <Box display="flex">
-            <Form onSubmit={updatePie} defaultValues={pie} >
-                <Select name="type" options={["CIRCLE", "SQUARE"]} />
+    return <Card style={{ padding: '1rem', marginBottom: 8 }}>
+        <Box display="flex" alignItems='flex-start'>
+            <Form onSubmit={updatePie} defaultValues={pie}>
+                <ToggleGroup name="type" defaultValue={pie.type} options={PIE_OPTS} />
+                <br />
                 <Input name="size" label="Size" placeholder="Size (Inches)" />
                 <Input name="cost" label="Cost" placeholder="Cost of Pizza ($)" />
             </Form>
@@ -214,7 +229,7 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
         },
         [actions],
     );
-    return <Box style={{ padding: '1rem' }}>
+    return <Box style={{ padding: '1rem 0px' }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" style={{ borderBottom: '1px solid rgba(0,0,0,0.2)', marginBotom: 6 }}>
             <Typography variant={'h6'}>Order Combo #{index + 1}</Typography>
             <IconButton onClick={removeSet}>
@@ -251,9 +266,11 @@ const Comparison = () => {
     } = state;
     return <PizzaContext.Provider value={{ state, actions }}>
         <Container>
-            <Typography variant="h4" textAlign="center">Compare Pizza Orders</Typography>
-            <Typography variant="h6" textAlign="center">Find the best one!</Typography>
             <Grid container>
+                <Box marginTop={2} marginBottom={2}>
+                    <Typography variant="h4" fontWeight="bold" textAlign="center">Compare Pizza Orders</Typography>
+                    <Typography variant="h6" textAlign="center">Find the best one!</Typography>
+                </Box>
                 <Box display={'flex'}>
                     {
                         optionSets.map((set, i) => <Box flex={1} key={i}>

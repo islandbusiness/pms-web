@@ -1,13 +1,11 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react';
-import { useForm, Controller, FormContext } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import {
     Box,
     Button,
     withStyles,
     TextField,
-    Input as MUIInput,
-    Select as MUISelect,
     MenuItem,
     IconButton,
     Typography
@@ -34,61 +32,6 @@ const SubmitButton = withStyles((theme) => ({
 }))(Button);
 
 
-const MINUTES_UNIT = 15;
-const MINIMUM_UNITS = 1; // 15 minutes minumum
-const MINIMUM_MINUTES = MINUTES_UNIT * MINIMUM_UNITS;
-const DEFAULT_MINUTES = 120;
-
-const CostEstimateTypography = withStyles({
-    root: {
-        fontSize: 24,
-    },
-})(Typography);
-
-const ListingDurationInput = ({ setValue, inputProps: { dailyMaxRate = 0, hourlyRate = 0 }, label, register, name }) => {
-    const [duration, setDuration] = useState(DEFAULT_MINUTES);
-    const handleIncrementDuration = () => setDuration(duration + MINUTES_UNIT);
-    const handleDecrementDuration = () => setDuration(Math.max(duration - MINUTES_UNIT, MINIMUM_MINUTES));
-    useEffect(() => {
-        setValue(name, duration, true);
-        return () => {
-            // Do nothing to cleanup
-        };
-    }, [duration]);
-    useEffect(() => {
-        register({ name }); // custom register react-select
-    }, [register]);
-    const quarterlyRate = hourlyRate / 4;
-    const preCappedRate = (duration / MINUTES_UNIT) * quarterlyRate;
-    const currentRate = dailyMaxRate ? Math.min(preCappedRate, dailyMaxRate) : preCappedRate;
-    return (
-        <React.Fragment>
-            <FormLabel><Typography variant="subtitle1">{label}</Typography></FormLabel>
-            <Box display="flex" alignItems="center">
-                <Box flex={1}>
-                    <Box display="flex" alignItems="center">
-                        <Typography variant="h2">
-                            {(duration)}
-                        </Typography>
-                        <Box component="span" marginLeft={2}>
-                            <CostEstimateTypography variant="subtitle1" fontSize={34}>
-                                {currentRate && formatAsDollar(currentRate)}
-                            </CostEstimateTypography>
-                        </Box>
-                    </Box>
-                </Box>
-                <IconButton variant="" disabled={duration <= MINIMUM_MINUTES} onClick={handleDecrementDuration}>
-                    <MinusIcon />
-                </IconButton>
-                <IconButton variant="" onClick={handleIncrementDuration}>
-                    <AddIcon />
-                </IconButton>
-            </Box>
-        </React.Fragment>
-    );
-};
-
-
 export function Input({ register, name, ...rest }) {
     return <TextField name={name} inputRef={register} {...rest} />;
 }
@@ -106,6 +49,34 @@ export function Select({ register, options, label, name, ...rest }) {
             </select>
         </React.Fragment>
     );
+}
+
+export function ToggleGroup({ register, required, setValue, defaultValue, options, label, name, ...rest }) {
+    const [internalValue, setInternalValue] = useState(defaultValue);
+
+    const handleNewValue = (event, newValue) => {
+      setInternalValue(newValue);
+    };
+    useEffect(() => {
+        console.log(name, internalValue)
+        setValue(name, internalValue);
+        return () => {
+            // Do nothing to cleanup
+        };
+    }, [internalValue]);
+    useEffect(() => {
+        register({ name, required }); // custom register react-select
+    }, [register]);
+
+    return <ToggleButtonGroup label={label} value={internalValue} exclusive onChange={handleNewValue} aria-label={label} {...rest}>
+        {
+            options.map((opt) => <ToggleButton value={opt.value} aria-label={opt.label}>
+                {
+                    opt.icon
+                }
+            </ToggleButton>)
+        }
+    </ToggleButtonGroup>
 }
 
 export function Form({
