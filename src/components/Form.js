@@ -15,6 +15,7 @@ import {
 import { Debug } from './admin';
 import { formatAsDollar } from '../utils/finance';
 import AddIcon from '@material-ui/icons/Add';
+import SaveIcon from '@material-ui/icons/Save';
 import MinusIcon from '@material-ui/icons/Remove';
 import FormLabel from '@material-ui/core/FormLabel';
 import ToggleButton from '@material-ui/lab/ToggleButton';
@@ -24,9 +25,7 @@ const SubmitButton = withStyles((theme) => ({
     root: {
         fontSize: 16,
         fontWeight: 'bolder',
-        minWidth: 90,
         textTransform: 'none',
-        width: '80%',
         padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
         borderRadius: 90,
     },
@@ -112,7 +111,7 @@ export function Select({ register, options, label, name, ...rest }) {
 export function Form({
     defaultValues = {},
     schemaValidation,
-    renderSubmitText = () => 'Pay',
+    renderSubmitText = () => <SaveIcon />,
     hideSubmit,
     submitContainerProps = {},
     children,

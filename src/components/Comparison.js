@@ -97,7 +97,9 @@ const comparisonReducer = (state, action) => {
                 optionSets: state.optionSets.map((set, idx) => idx !== action.setIdx ? set : {
                     ...set,
                     pies: set.pies.map((pie, pieIdx) => pieIdx !== action.pieIdx ? pie : {
-                        ...pie
+                        ...action.payload,
+                        size: +action.payload.size,
+                        cost: +action.payload.cost
                     })
                 })
             }
@@ -176,10 +178,17 @@ const PieLine = ({ pie, setIdx, pieIdx }) => {
         },
         [actions],
     );
-    return <Box>
+    const updatePie = useCallback(
+        (args) => {
+            alert(JSON.stringify(args))
+            actions.updatePizza(setIdx, pieIdx, args)
+        },
+        [actions],
+    );
+    return <Card style={{padding: '1rem', marginBottom: 8}}>
         Pie #{pieIdx + 1}
         <Box display="flex">
-            <Form onSubmit={(v) => alert(v)} defaultValues={pie} hideSubmit>
+            <Form onSubmit={updatePie} defaultValues={pie} >
                 <Select name="type" options={["CIRCLE", "SQUARE"]} />
                 <Input name="size" label="Size" placeholder="Size (Inches)" />
                 <Input name="cost" label="Cost" placeholder="Cost of Pizza ($)" />
@@ -188,8 +197,7 @@ const PieLine = ({ pie, setIdx, pieIdx }) => {
                 <DeleteIcon />
             </IconButton>
         </Box>
-
-    </Box>
+    </Card>
 }
 
 const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
@@ -206,7 +214,7 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
         },
         [actions],
     );
-    return <Card style={{ padding: '1rem' }}>
+    return <Box style={{ padding: '1rem' }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" style={{ borderBottom: '1px solid rgba(0,0,0,0.2)', marginBotom: 6 }}>
             <Typography variant={'h6'}>Order Combo #{index + 1}</Typography>
             <IconButton onClick={removeSet}>
@@ -230,7 +238,7 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
         <Button variant="contained" color="Primary" onClick={addPieToSet}>
             <AddIcon /> Pie
         </Button>
-    </Card>
+    </Box>
 }
 
 const PizzaContext = React.createContext();
