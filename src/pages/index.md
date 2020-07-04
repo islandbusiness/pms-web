@@ -7,15 +7,10 @@ subheading: Dont get ripped off by Big Pizza
 mainpitch:
   title: Why PriceMySlice
   description: >
-    PriceMySlice is the pizza store for everyone who believes that great pizza
-    shouldn't just taste good, it should do good too. We source all of our beans
-    directly from small scale sustainable farmers and make sure part of the
-    profits are reinvested in their communities.
+    PriceMySlice is the pizza tool for everyone who believes that great pizza
+    shouldn't just taste good, it should not cost you as much as you want.
 description: >-
-  PriceMySlice is the ultimate spot for pizza lovers who want to learn about their
-  java’s origin and support the farmers that grew it. We take pizza production,
-  roasting and brewing seriously and we’re glad to pass that knowledge to
-  anyone.
+  PriceMySlice is the ultimate spot for pizza lovers who want to learn how to optimize their pizza game. We take pizza ordering, purchasing and eating seriously and we’re glad to pass that knowledge to anyone.
 intro:
   blurbs:
     - image: /img/coffee.png

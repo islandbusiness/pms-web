@@ -1,17 +1,17 @@
-import React, { useReducer, useCallback } from 'react';
-import Card from '@material-ui/core/Card'
-import Container from '@material-ui/core/Container'
-import Grid from '@material-ui/core/Grid'
-import Button from '@material-ui/core/Button'
-import Box from '@material-ui/core/Box'
-import Typography from '@material-ui/core/Typography'
-import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
-import { Form, ToggleGroup, Input } from './Form';
 import { IconButton } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import AddIcon from '@material-ui/icons/Add';
+import CropLandscapeIcon from '@material-ui/icons/CropLandscape';
+import DeleteIcon from '@material-ui/icons/Delete';
 import LocalPizzaIcon from '@material-ui/icons/LocalPizza';
-import CropLandscapeIcon from '@material-ui/icons/CropLandscape'
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
+import React, { useCallback, useReducer } from 'react';
+import { Form, Input, ToggleGroup } from './Form';
 export const ACTIONS = {
     ADD_SET: 'ADD_SET',
     REMOVE_SET: 'REMOVE_SET',
@@ -60,7 +60,7 @@ const getInitialState = () => {
             makeDefaultOptionSet(),
             makeDefaultOptionSet({
                 pies: [
-                    makeDefaultPizza({ size: 20, cost: 20 })
+                    makeDefaultPizza({ diameter: 20, cost: 20 })
                 ]
             }),
         ],
@@ -101,6 +101,7 @@ const comparisonReducer = (state, action) => {
                 optionSets: state.optionSets.map((set, idx) => idx !== action.setIdx ? set : {
                     ...set,
                     pies: set.pies.map((pie, pieIdx) => pieIdx !== action.pieIdx ? pie : {
+                        ...pie,
                         ...action.payload,
                         size: +action.payload.size,
                         cost: +action.payload.cost
@@ -220,11 +221,15 @@ const PieLine = ({ pie, setIdx, pieIdx }) => {
         <Box display="flex" alignItems='flex-start'>
             <Box flex={1}>
                 <ToggleGroup name="type" defaultValue={pie.type} onChange={swapPieType} options={PIE_OPTS} />
-                <Form onSubmit={updatePie} defaultValues={pie}>
+                <Form key={pie.type} onSubmit={updatePie} defaultValues={pie}>
                     {
-                        formChildren
+                        [
+                            <input type="hidden" name="type" label="Quantity" value={pie.type} />,
+                            ...formChildren,
+                            <Input name="quantity" label="Quantity" placeholder="# of Pizzas" />,
+                            <Input name="cost" label="Cost" placeholder="Cost of Pizza ($)" />
+                        ]
                     }
-                    <Input name="cost" label="Cost" placeholder="Cost of Pizza ($)" />
                 </Form>
             </Box>
             <IconButton onClick={removePie}>
@@ -234,7 +239,28 @@ const PieLine = ({ pie, setIdx, pieIdx }) => {
     </Card>
 }
 
-const getPieArea = (pie) => pie.type === PIZZA_SHAPES[0] ? Math.PI * (pie.size / 2) ** 2 : (pie.width * pie.height)
+const getPieArea = (pie) => pie.type === PIZZA_SHAPES[0] ? Math.PI * (pie.diameter / 2) ** 2 : (pie.width * pie.height);
+
+const getPieSummary = pies => {
+
+    const reducedData = pies.reduce((acc, pie) => {
+        let unitArea = getPieArea(pie) * pie.quantity;
+        let unitTotal = pie.cost * pie.quantity;
+        return {
+            ...acc,
+            area: acc.area + unitArea,
+            total: acc.total + unitTotal
+        }
+    }, {
+        total: 0,
+        area: 0
+    });
+
+    return {
+        ...reducedData,
+        cpi: Math.max(reducedData.total, 1) / reducedData.area
+    }
+};
 
 const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
 
@@ -250,16 +276,8 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
         },
         [actions],
     );
-    const summaryData = pies.reduce((acc, pie) => {
-
-        return {
-            ...acc,
-            area: acc.area + getPieArea(pie),
-            total: acc.total + pie.cost
-        }
-    }, {
-        total: 0
-    })
+    const summaryData = getPieSummary(pies);
+    
     return <Box style={{ padding: '1rem 0px' }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" style={{ borderBottom: '1px solid rgba(0,0,0,0.2)', marginBotom: 6 }}>
             <Typography variant={'h6'}>Order Combo #{index + 1}</Typography>
@@ -270,12 +288,18 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
         <Box display="flex">
             {pies.map((p, idx) => <LocalPizzaIcon key={idx} />)}
         </Box>
-        <Box display="flex" justifyContent="space-around">
+        <Box>
             <Typography>
                 {pies.length} Pies
             </Typography>
-            <Typography>
+            <Typography display="block">
                 ${summaryData.total} Total
+            </Typography>
+            <Typography display="block">
+                {Math.floor(summaryData.area)}in^2 Area
+            </Typography>
+            <Typography display="block">
+                ${(summaryData.cpi).toFixed(2)} / square inch
             </Typography>
         </Box>
         {
@@ -285,7 +309,9 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
             <AddIcon /> Pie
         </Button>
     </Box>
-}
+};
+
+
 
 const PizzaContext = React.createContext();
 
