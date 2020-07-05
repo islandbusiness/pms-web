@@ -30,10 +30,17 @@ const SubmitButton = withStyles((theme) => ({
     label: {
     },
 }))(Button);
+const TextInput = withStyles((theme) => ({
+    root: {
+        width: '100%'
+    },
+    input: {
 
+    }
+}))(TextField);
 
 export function Input({ register, name, ...rest }) {
-    return <TextField name={name} inputRef={register} {...rest} />;
+    return <TextInput name={name} inputRef={register} {...rest} />;
 }
 
 export function Select({ register, options, label, name, ...rest }) {
@@ -119,7 +126,7 @@ export function Form({
                     })
                     : child))
                 : children}
-            <Box textAlign="center" {...submitContainerProps}>
+            <Box textAlign="center" marginTop={2} {...submitContainerProps}>
                 {
                     hideSubmit ? null
                         : (

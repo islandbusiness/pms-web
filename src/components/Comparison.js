@@ -217,10 +217,15 @@ const PieLine = ({ pie, setIdx, pieIdx }) => {
             <Input name="width" label="Width" placeholder="Width (Inches)" />
 
         ];
-    return <Card style={{ padding: '1rem', marginBottom: 8 }}>
-        <Box display="flex" alignItems='flex-start'>
-            <Box flex={1}>
+    return <Box style={{ padding: '1rem 0px', marginBottom: 8 }}>
+        <Box alignItems='flex-start'>
+            <Box display='flex' justifyContent="space-between">
                 <ToggleGroup name="type" defaultValue={pie.type} onChange={swapPieType} options={PIE_OPTS} />
+                <IconButton onClick={removePie}>
+                    <DeleteIcon />
+                </IconButton>
+            </Box>
+            <Box flex={1}>
                 <Form key={pie.type} onSubmit={updatePie} defaultValues={pie}>
                     {
                         [
@@ -232,11 +237,9 @@ const PieLine = ({ pie, setIdx, pieIdx }) => {
                     }
                 </Form>
             </Box>
-            <IconButton onClick={removePie}>
-                <DeleteIcon />
-            </IconButton>
+
         </Box>
-    </Card>
+    </Box>
 }
 
 const getPieArea = (pie) => pie.type === PIZZA_SHAPES[0] ? Math.PI * (pie.diameter / 2) ** 2 : (pie.width * pie.height);
@@ -277,9 +280,9 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
         [actions],
     );
     const summaryData = getPieSummary(pies);
-    
-    return <Box style={{ padding: '1rem 0px' }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" style={{ borderBottom: '1px solid rgba(0,0,0,0.2)', marginBotom: 6 }}>
+
+    return <Card elevation={4} style={{ padding: '1rem', marginBottom: '1rem' }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" style={{ marginBotom: 6 }}>
             <Typography variant={'h6'}>Order Combo #{index + 1}</Typography>
             <IconButton onClick={removeSet}>
                 <DeleteIcon />
@@ -305,10 +308,12 @@ const ComparisonSet = ({ actions, pies = [], index = 0 }) => {
         {
             pies.map((pie, i) => <PieLine setIdx={index} pieIdx={i} actions={actions} key={i} pie={pie} />)
         }
-        <Button variant="contained" color="Primary" onClick={addPieToSet}>
-            <AddIcon /> Pie
-        </Button>
-    </Box>
+        <Box display='flex' justifyContent="center" marginTop={3} marginBottom={3}>
+            <Button variant="contained" color="primary" onClick={addPieToSet}>
+                <AddIcon /> Pie
+            </Button>
+        </Box>
+    </Card>
 };
 
 
@@ -328,15 +333,19 @@ const Comparison = () => {
                     <Typography variant="h4" fontWeight="bold" textAlign="center">Compare Pizza Orders</Typography>
                     <Typography variant="h6" textAlign="center">Find the best one!</Typography>
                 </Box>
-                <Box display={'flex'}>
+                <Grid item xs={12}>
                     {
-                        optionSets.map((set, i) => <Box flex={1} key={i}>
+                        optionSets.map((set, i) => <Grid item xs={12} sm={6} flex={1} key={i}>
                             <ComparisonSet index={i} actions={actions} {...set} />
-                        </Box>)
+                        </Grid>)
                     }
-                </Box>
-                <Grid item>
-                    <Button variant="h5" textAlign="center" onClick={actions.addOptionSet}>Add New Set</Button>
+                </Grid>
+                <Grid item xs={12}>
+                    <Box display='flex' justifyContent="center" marginTop={3} marginBottom={3}>
+                        <Button variant="outlined" textAlign="center" onClick={actions.addOptionSet}>
+                            New Pizza Order
+                        </Button>
+                    </Box>
                 </Grid>
             </Grid>
         </Container>
